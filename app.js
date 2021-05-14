@@ -31,7 +31,7 @@ dbConnection()
     })
     .catch(err => console.log(err))
 
-app.use(cors({ credentials: true, origin: 'http://localhost:3000' }))
+app.use(cors({ credentials: true, origin: 'malik-lbssociety-lbs-mirror-front-test.zeet.app' }))
 app.use(express.json()) // json api
 app.use(cookieParser())
 
