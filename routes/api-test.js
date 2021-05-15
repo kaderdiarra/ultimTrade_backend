@@ -5,7 +5,9 @@ const router = express.Router()
 const apiTestController = require('../controllers/api-test')
 
 //const Client = require('../models/client')
-router.get('/test-api', apiTestController.apiTest)
+router.get('/', ((req, res) => {
+    res.status(200).send({message: 'OK'})
+}))
 /*router.get('/newClient', (req, res) => {
     const client = new Client({
         firstName: "Kader",
