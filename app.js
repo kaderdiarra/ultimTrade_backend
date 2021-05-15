@@ -45,6 +45,7 @@ dbConnection()
         console.log('connected to db')
         app.listen(PORT, () => {
             console.log(`Listening on Port: ${PORT}`)
+            console.log(`FRONTEND HOST: ${process.env.CORS_FRONTEND_ORIGIN}`)
         })
     })
     .catch(err => console.log(err))
