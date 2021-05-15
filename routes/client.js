@@ -7,7 +7,7 @@ const { authorization } = require('../middleware/authorization')
 
 
 // get all clients
-router.get('/', authorization, controllers.getAllClients)
+router.get('/', /*authorization,*/ controllers.getAllClients)
 
 // create new client
 router.post('/create', clientValidationRules(), validate, authorization, controllers.createClient)
