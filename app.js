@@ -14,7 +14,7 @@ const historyRouter = require('./routes/history')
 const userRouter = require('./routes/user')
 
 const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: process.env.CORS_FRONTEND_ORIGIN,
     optionsSuccessStatus: 200
 }
 
