@@ -21,11 +21,11 @@ exports.authorization = async (req, res, next) => {
 exports.verifyTokenExpritation = (req, res) => {
     try {
         const token = req.cookies?.token
-
+        console.log('PRINT AUTH TOKEN:', token)
         if (token) {
             const decodedData = jwt.verify(token, process.env.JWT_SECRET)
             if (decodedData) {
-                console.log("token: ", token)
+                //console.log("token: ", token)
                 tokenDuration = jwtDecode(token)
                 if (tokenDuration.exp * 1000 > new Date().getTime()) {
                     res.status(200).send(true)
