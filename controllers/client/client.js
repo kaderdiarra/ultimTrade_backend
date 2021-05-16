@@ -16,7 +16,7 @@ exports.getAllClients = async(req, res) => {
         const clients = await Client.find({}, {...projection})
         console.log("ENTER !!!!!!!!!!!!!!!!!!")
         console.log(clients)
-        res.status(200).send(clients)
+        res.status(200).json(clients)
     } catch (error) {
         console.log(error)
         res.status(500).end()
