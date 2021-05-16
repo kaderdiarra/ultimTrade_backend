@@ -10,7 +10,6 @@ exports.authorization = async (req, res, next) => {
     if (!token) {
         res.status(403).send()
     }
-    console.log('AUTH TOKEN: ', token)
     try {
         const decodedData = jwt.verify(token, process.env.JWT_SECRET)
         next()
@@ -25,7 +24,6 @@ exports.verifyTokenExpritation = (req, res) => {
         //const token = req.cookies?.token
         const token = req.headers.authorization?.split(" ")[1]
 
-        console.log('PRINT AUTH TOKEN:', token)
         if (token) {
             const decodedData = jwt.verify(token, process.env.JWT_SECRET)
             if (decodedData) {

@@ -14,7 +14,6 @@ const projection = {
 exports.getAllClients = async(req, res) => {
     try {
         const clients = await Client.find({}, {...projection})
-        //console.log(clients)
         res.status(200).json(clients)
     } catch (error) {
         console.log(error)
@@ -46,7 +45,6 @@ exports.createClient = async(req, res) => {
             }
         })
         const result = await client.save()
-        console.log('user created')
         res.status(201).send(result)
     } catch (error) {
         console.log(error)
@@ -95,7 +93,6 @@ exports.updateUser = async(req, res) => {
         }
 
         const result = await Client.findByIdAndUpdate(_id, updateData, option)
-        console.log(result)
         res.status(200).send(result)
     } catch (error) {
         console.log(error)
@@ -109,7 +106,6 @@ exports.searchClients = async(req, res) => {
     let toSearch = query.toSearch?.split(' ')
     toSearch = toSearch?.join('|') ?? ''
 
-    console.log('search: ', query)
     try {
         const clients = await Client.find({
             $or: [

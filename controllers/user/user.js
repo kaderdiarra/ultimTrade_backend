@@ -23,8 +23,6 @@ exports.userLogin = async(req, res) => {
         const options = { expiresIn: '1h' }
         const token = jwt.sign({...payload}, process.env.JWT_SECRET, options)
 
-        // save toke in cookie
-        console.log('CREATED TOKEN: ', token)
         res
             .status(202)
             /*.cookie('token', token, {
