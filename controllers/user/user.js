@@ -27,13 +27,13 @@ exports.userLogin = async(req, res) => {
         console.log('CREATED TOKEN: ', token)
         res
             .status(202)
-            .cookie('token', token, {
+            /*.cookie('token', token, {
                 httpOnly: true,
                 //secure: true,
                 //sameSite: 'strict', // sending cookie mode
                 //maxAge: 10000,
                 //signed: true,
-            })
+            })*/
             .send({user: payload, token})
     } catch (error) {
         console.log(error)

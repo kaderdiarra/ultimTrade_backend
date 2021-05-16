@@ -4,13 +4,15 @@ const jwtDecode = require('jwt-decode')
 require('dotenv').config()
 
 exports.authorization = async (req, res, next) => {
-    const token = req.cookies.token//req.headers.authorization?.split(" ")[1]
+    //const token = req.cookies.token
+    const token = req.headers.authorization?.split(" ")[1]
+
     if (!token) {
         res.status(403).send()
     }
     console.log('AUTH TOKEN: ', token)
     try {
-        let decodedData = jwt.verify(token, process.env.JWT_SECRET)
+        const decodedData = jwt.verify(token, process.env.JWT_SECRET)
         next()
     } catch (error) {
         console.log(error)
@@ -20,7 +22,9 @@ exports.authorization = async (req, res, next) => {
 
 exports.verifyTokenExpritation = (req, res) => {
     try {
-        const token = req.cookies?.token
+        //const token = req.cookies?.token
+        const token = req.headers.authorization?.split(" ")[1]
+
         console.log('PRINT AUTH TOKEN:', token)
         if (token) {
             const decodedData = jwt.verify(token, process.env.JWT_SECRET)
