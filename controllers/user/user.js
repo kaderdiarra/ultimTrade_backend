@@ -34,7 +34,7 @@ exports.userLogin = async(req, res) => {
                 //maxAge: 10000,
                 //signed: true,
             })
-            .send({user: payload})
+            .send({user: payload, token})
     } catch (error) {
         console.log(error)
         res.status(500).end()
