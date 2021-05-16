@@ -10,6 +10,6 @@ router.post('/login', userLoginValidationRules(), validate, controllers.userLogi
 
 router.post('/create', userCreationValidationRules(), validate, controllers.createUser)
 
-router.get('/verifyToken', verifyTokenExpritation)
+router.get('/verifyToken'/*, verifyTokenExpritation*/)
 
 module.exports = router
