@@ -14,7 +14,6 @@ const projection = {
 exports.getAllClients = async(req, res) => {
     try {
         const clients = await Client.find({}, {...projection})
-        console.log("ENTER !!!!!!!!!!!!!!!!!!")
         console.log(clients)
         res.status(200).json(clients)
     } catch (error) {
