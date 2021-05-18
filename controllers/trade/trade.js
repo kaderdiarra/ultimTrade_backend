@@ -1,105 +1,9 @@
 const { matchedData } = require('express-validator')
-const axios = require('axios')
 const Client = require('../../models/client')
-const { decrypt } = require('../../utils/secure-data')
-const { axiosError } = require('../../utils/axios-utils')
-const createSignature = require('../../utils/create-signature')
+const { axiosInstance } = require('../../utils/axios-utils')
 const { createHistory } = require('../../controllers/history/history')
-
-const axiosInstance = axios.create({
-    baseURL: process.env.BINANCE_API_URL,
-    timeout: 5000,
-})
-
-function getUsdt(balances) {
-    const result = balances.reduce((accumulator, currentValue) => {
-        if (currentValue.asset === 'USDT' &&  currentValue.free >= 10)
-            return currentValue.free
-        return accumulator
-    }, 0)
-    return result
-}
-
-async function getUserBalance(client, percentage) {
-    try {
-        const apiKey = decrypt(client.apiKey)
-        const secretKey = decrypt(client.secretKey)
-        const timestamp = new Date().getTime()
-        const signature = createSignature(secretKey, {timestamp})
-        const result = await axiosInstance.get('account', {
-            params: {
-                timestamp,
-                signature,
-            },
-            headers: {
-                'Content-Type': 'application/json',
-                'X-MBX-APIKEY': apiKey
-            }
-        })
-        const balances = result.data?.balances
-        const usdtBalance = getUsdt(balances)
-        if (usdtBalance < 10)
-            throw new Error('Insufficient usdt balance')
-        const amount = Math.trunc((usdtBalance * percentage) / 100)
-        return (amount)
-    } catch (error) {
-        console.log(error)
-        return 0
-    }
-}
-
-async function getClientWithPercentageBalance(clients, percentage) {
-    try {
-        promises = clients.map(async (client) => {
-            return {
-                client,
-                amount: await getUserBalance(client, percentage),
-            }
-        })
-        const result = await Promise.all(promises)
-        return result
-    } catch (error) {
-        console.log(error)
-    }
-}
-
-const binanceOrder = async (client, orderInfo) => {
-    const clientInfoToSend = {
-        userId: client._id,
-        firstName: client.firstName,
-        lastName: client.lastName,
-        email: client.email,
-    }
-
-    const newOrderInfo = {...orderInfo}
-
-    const apiKey = decrypt(client.apiKey)
-    const secretKey = decrypt(client.secretKey)
-    try {
-        newOrderInfo.timestamp = new Date().getTime()
-        newOrderInfo.signature = createSignature(secretKey, newOrderInfo)
-        const result = await axiosInstance.post('order', null, {
-            params: {...newOrderInfo},
-            headers: {
-                'Content-Type': 'application/json',
-                'X-MBX-APIKEY': apiKey
-            }
-        })
-        return {
-            ...clientInfoToSend,
-            status: true,
-        }
-
-    } catch (error) {
-        console.log('FAIL:')
-        console.log(`id: ${client._id} name: ${client.firstName} ${client.lastName}`)
-        axiosError(error)
-        return {
-            ...clientInfoToSend,
-            status: false,
-        }
-    }
-}
+const binanceOrder = require('./binanceOrder')
+const getClientAmountPercentage = require('./getClientAmountPercentage')
 
 
 /**
@@ -123,12 +27,28 @@ function getSucessQuantity(results) {
     })
 }
 
+async function getSymbolePrice(symbolName) {
+    try {
+        const result = await axiosInstance.get('/ticker/price', {
+            params: {symbol: symbolName},
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        if (result.data)
+            return result.data.price
+        throw new Error('Cannot get symbol price')
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 exports.trade = async (req, res) => {
     const body = matchedData(req, { locations: ['body'] })
     const clientsId = body.clientsId
-    const { amountType, amountPercentage } = body
+    const { amountType, amountPercentage, symbol } = body
     const orderInfo = {
-        symbol: body.symbol,
+        symbol: symbol.name,
         side: body.side,
         type: body.type,
         quoteOrderQty: body.quoteOrderQty,
@@ -142,7 +62,19 @@ exports.trade = async (req, res) => {
         }})
 
         if (amountType === 'PERCENTAGE') {
-            const newClients = await getClientWithPercentageBalance(clients, amountPercentage)
+            /** */
+            const sideOrderInfo = {
+                symbol,
+                amountPercentage,
+                side: body.side,
+                symbolPrice: 0,
+            }
+            if (orderInfo.side === 'SELL') {
+                // get base price in quote
+                sideOrderInfo.symbolPrice = await getSymbolePrice(symbol.name)
+            }
+            const newClients = await getClientAmountPercentage(clients, amountPercentage, sideOrderInfo)
+            /** */
             promises = newClients.map(async elem => {
                 const result = await binanceOrder(elem.client, {...orderInfo, quoteOrderQty: elem.amount})
                 return result
@@ -156,11 +88,13 @@ exports.trade = async (req, res) => {
             ordersResponse = await Promise.all(promises)
         }
 
+        const time = new Date().getTime()
         await createHistory({
             data: ordersResponse,
             info: {
                 side: orderInfo.side,
                 symbol: orderInfo.symbol,
+                time,
                 successQuantity: getSucessQuantity(ordersResponse),
             }
         })
@@ -169,7 +103,7 @@ exports.trade = async (req, res) => {
             info: {
                 side: orderInfo.side,
                 symbol: orderInfo.symbol,
-                time: new Date().getTime(),
+                time,
                 successQuantity: getSucessQuantity(ordersResponse),
             }
         })

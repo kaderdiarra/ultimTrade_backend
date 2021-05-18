@@ -1,0 +1,1 @@
+exports.MINIMUM_PRICE = 10

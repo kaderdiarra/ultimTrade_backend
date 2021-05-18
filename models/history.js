@@ -13,7 +13,7 @@ const historySchema = new Schema({
         }
     ],
     info: {
-        time: {type: Date, default: new Date().getTime()},
+        time: {type: Date, required: true},
         side: {type: String, required: true},
         symbol: {type: String, required: true},
         successQuantity: {

@@ -8,7 +8,7 @@ exports.authorization = async (req, res, next) => {
     const token = req.headers.authorization?.split(" ")[1]
 
     if (!token) {
-        res.status(403).send()
+        res.status(403).send('Need authorization | Acces denied')
     }
     try {
         const decodedData = jwt.verify(token, process.env.JWT_SECRET)
@@ -38,7 +38,7 @@ exports.verifyTokenExpritation = (req, res) => {
         throw new Error('Invalid token')
     } catch (error) {
         console.log(error)
-        res.clearCookie('token')
+        //res.clearCookie('token')
         res.status(400).send('Need authorization | Acces denied')
     }
 }

@@ -15,7 +15,7 @@ function axiosError(error) {
 }
 
 function createAxiosInstance(apiKey = null, timeout = 5000) {
-    const axiosInstance = axios.create({
+    const instance = axios.create({
         baseURL: process.env.BINANCE_API_URL,
         timeout,
         headers: {
@@ -24,10 +24,16 @@ function createAxiosInstance(apiKey = null, timeout = 5000) {
         }
     })
 
-    return axiosInstance
+    return instance
 }
+
+const axiosInstance = axios.create({
+    baseURL: process.env.BINANCE_API_URL,
+    timeout: 5000,
+})
 
 module.exports = {
     axiosError,
     createAxiosInstance,
+    axiosInstance,
 }

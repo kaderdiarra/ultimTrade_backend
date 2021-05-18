@@ -16,6 +16,10 @@ const isValidObjectId = (id) => {
 
 const containsValue = (value, container) => container?.includes(value)
 
+const verifySymbols = (symbol, element) => {
+    return containsValue(symbol?.name, element)
+}
+
 const clientValidationRules = () => {
     return [
         body('firstName', 'Invalid first name').notEmpty().isString().custom(isAlphaWithSpace).isLength({ min: 3, max: 30 }).toLowerCase(),
@@ -64,12 +68,11 @@ const clientUpdateRules = () => {
     ]
 }
 
-
 const tradingRules = () => {
     return [
         body('clientsId', 'Invalid clients id').notEmpty().isArray(),
         body('clientsId.*', 'Invalid clients id').isString().isAlphanumeric().custom(isValidObjectId),
-        body('symbol', 'Invalid symbol').notEmpty().isString().isAlpha().custom(value => containsValue(value, ['BTCUSDT', 'ZECUSDT', 'HIVEUSDT', 'ICXUSDT', 'COTIUSDT', 'NEOUSDT',])),
+        body('symbol', 'Invalid symbol').notEmpty().isObject().custom(value => verifySymbols(value, ['BTCUSDT', 'ZECUSDT', 'HIVEUSDT', 'ICXUSDT', 'COTIUSDT', 'NEOUSDT',])),
         body('side', 'Invalid side').notEmpty().isString().isAlpha().custom(value => containsValue(value, ['SELL', 'BUY'])),
         body('type', 'Invalid type').notEmpty().isString().custom(value => containsValue(value, ['LIMIT', 'MARKET'])),
         body('quoteOrderQty', 'Invalid quoteOrderQty').optional().isNumeric(),
