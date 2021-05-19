@@ -57,6 +57,7 @@ async function getClientBalance(client, percentage, sideOrderInfo) {
             amount = 10
         //console.log('BALANCE:', symbolBalance)
         //console.log('AMOUNT:', amount)
+        //console.log('SYMBOLE PRICE:', sideOrderInfo.symbolPrice)
         return amount
     } catch (error) {
         console.log(error)
