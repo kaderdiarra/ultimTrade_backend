@@ -1,6 +1,7 @@
 const { body, param, query, validationResult } = require('express-validator')
 const ObjectId = require('mongoose').Types.ObjectId
 const { isValidApiKey, isValidSecretKey } = require('../utils/validate-keys')
+const { SYMBOLS } = require('../constants/constant')
 
 const isAlphaWithSpace = value => value.match(/^[A-Za-zÀ-ÖØ-öø-ÿ ]+$/)
 const isAlphaNumWithSpace = value => value.match(/^$|^[0-9A-Za-zÀ-ÖØ-öø-ÿ ]+$/)
@@ -72,7 +73,7 @@ const tradingRules = () => {
     return [
         body('clientsId', 'Invalid clients id').notEmpty().isArray(),
         body('clientsId.*', 'Invalid clients id').isString().isAlphanumeric().custom(isValidObjectId),
-        body('symbol', 'Invalid symbol').notEmpty().isObject().custom(value => verifySymbols(value, ['BTCUSDT', 'ZECUSDT', 'HIVEUSDT', 'ICXUSDT', 'COTIUSDT', 'NEOUSDT', 'DIAUSDT', 'XLMUSDT'])),
+        body('symbol', 'Invalid symbol').notEmpty().isObject().custom(value => verifySymbols(value, SYMBOLS)),
         body('side', 'Invalid side').notEmpty().isString().isAlpha().custom(value => containsValue(value, ['SELL', 'BUY'])),
         body('type', 'Invalid type').notEmpty().isString().custom(value => containsValue(value, ['LIMIT', 'MARKET'])),
         body('quoteOrderQty', 'Invalid quoteOrderQty').optional().isNumeric(),
