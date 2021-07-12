@@ -19,7 +19,8 @@ const corsOptions = {
 }
 
 app.set('strict routing', false)
-app.use(cors(corsOptions)) // { credentials: true, origin: 'http://localhost:3000' }
+//app.use(cors(corsOptions)) // { credentials: true, origin: 'http://localhost:3000' }
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' }))
 app.use(express.json()) // json api
 app.use(cookieParser())
 
